@@ -7,9 +7,4 @@ public class QRStrategy implements IPaymentStrategy{
     public String getType() {
         return "QR";
     }
-
-    @Override
-    public String process(int amount) {
-        return amount + " TL QR ile ödendi.";
-    }
 }

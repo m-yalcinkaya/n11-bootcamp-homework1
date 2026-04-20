@@ -9,8 +9,4 @@ public class CreditCardStrategy implements IPaymentStrategy {
         return "CreditCard";
     }
 
-    @Override
-    public String process(int amount) {
-        return amount + " TL Kredi Kartı ile ödendi.";
-    }
 }

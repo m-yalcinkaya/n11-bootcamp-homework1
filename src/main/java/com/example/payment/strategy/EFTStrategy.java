@@ -7,8 +7,5 @@ public class EFTStrategy implements IPaymentStrategy{
         return "EFT";
     }
 
-    @Override
-    public String process(int amount) {
-        return amount + " TL " + getType() + " ile ödendi.";
-    }
+
 }

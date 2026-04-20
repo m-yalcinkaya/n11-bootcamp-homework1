@@ -6,8 +6,5 @@ public class GooglePayStrategy implements  IPaymentStrategy{
         return "GooglePay";
     }
 
-    @Override
-    public String process(int amount) {
-        return amount + " TL " + getType() + " ile ödendi.";
-    }
+
 }

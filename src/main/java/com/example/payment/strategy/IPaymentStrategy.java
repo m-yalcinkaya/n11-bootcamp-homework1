@@ -2,5 +2,8 @@ package com.example.payment.strategy;
 
 public interface IPaymentStrategy{
     String getType();
-    public String process(int amount);
+
+    default String process(int amount) {
+        return amount + " TL " + getType() + " ile ödendi.";
+    }
 }
