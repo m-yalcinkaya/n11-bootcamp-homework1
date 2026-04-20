@@ -1,24 +1,25 @@
-# 💳 Ödeme Yöntemi Entegrasyon Sistemi (SOLID & Strategy Pattern)
+# Ödeme Yöntemi Entegrasyon Sistemi (SOLID)
 
-Bu proje, bir ödeme sistemine mevcut kod yapısını bozmadan yeni ödeme yöntemlerinin (QR, EFT, vb.) nasıl eklenebileceğini **SOLID** prensiplerini ve **Strategy Design Pattern**'ı kullanarak simüle eden bir Spring Boot uygulamasıdır.
+Bu proje, bir ödeme sistemine mevcut kod yapısını bozmadan yeni ödeme yöntemlerinin (QR, EFT, vb.) nasıl eklenebileceğini **SOLID** prensiplerini ve **Strategy Design Pattern** ve **Factory Design Pattern** kullanarak simüle eden bir Spring Boot uygulamasıdır.
 
-## 🚀 Proje Hakkında
+## Proje Hakkında
 Uygulama, gerçek dünya senaryolarında karşılaşılan "mevcut sisteme yeni özellik ekleme" ihtiyacını, kodun sürdürülebilirliğini ve esnekliğini koruyarak çözmeyi amaçlar. Backend tarafı Java/Spring Boot ile kurgulanmış olup, basit bir HTML/JS arayüzü ile uçtan uca çalışmaktadır.
 
-## 📸 Uygulama Ekran Görüntüleri
-Sistemin çalışma anına dair arayüz ve başarılı işlem çıktıları aşağıdadır:
+## Uygulama Ekran Görüntüsü
+Sistemin çalışma anına dair arayüz işlem çıktıları aşağıdadır:
 
-![Ödeme Ekranı Arayüzü](screenshot1.png)
-![İşlem Başarılı Çıktısı](screenshot2.png)
+![Ödeme Ekranı Arayüzü](odemesistemi.png)
 
 
-## 🛠 Teknik Gereksinimler & Teknolojiler
-* **Dil:** Java 21
-* **Framework:** Spring Boot 4.0.5
-* **Tasarım Deseni:** Strategy Design Pattern
+## Teknik Gereksinimler & Teknolojiler
+* **Dil:** Java 17+
+* **Framework:** Spring Boot 4.0.5 (Web MVC + Data JPA + Validation)
+* **Database:** Postgresql 17.5
+* **Konteynerleştirme:** Docker & Docker Compose
+* **Tasarım Deseni:** Strategy Design Pattern, Factory Design Pattern
 * **Frontend:** Vanilla JavaScript & HTML (Client-Side Rendering)
 
-## 📌 Uygulanan SOLID Prensipleri
+## Uygulanan SOLID Prensipleri
 
 Proje geliştirilirken aşağıdaki yazılım prensipleri temel alınmıştır:
 
@@ -34,8 +35,52 @@ Sistem, yeni ödeme yöntemleri eklemeye **açık**, ancak mevcut kodu değişti
 ## 📂 Klasör Yapısı
 ```text
 com.example.payment
-├── constants       # PaymentType Enum (Tip güvenliği için)
-├── controller      # REST API Endpoint tanımları
-├── dto             # Veri taşıma objeleri (PaymentRequest)
-├── service         # İş mantığı ve Strateji yönetimi
-└── strategy        # Strateji arayüzü ve somut sınıflar
+├── controller
+│   └── PaymentController.java          // API Endpoint'leri (POST, GET)
+├── dto
+│   ├── converter
+│   │   └── PaymentDtoConverter.java    // Entity <-> DTO dönüşümü
+│   ├── CreatePaymentRequest.java       // Kullanıcıdan gelen ödeme verisi
+│   └── PaymentDto.java                 // Dışarıya dönülen ödeme verisi
+├── exception
+│   └── GlobalExceptionHandler.java     // Hata yakalama (Örn: 400 Bad Request)
+├── model
+│   └── Payment.java                    // PostgreSQL Tablosu (Entity)
+├── repository
+│   └── PaymentRepository.java          // JPA Repository (DB İşlemleri)
+├── service
+│   ├── PaymentFactory.java             // Doğru Stratejiyi Seçen Sınıf
+│   └── PaymentService.java             // İş Mantığının Yönetildiği Yer
+├── strategy
+│   ├── ApplePayStrategy.java           // Apple Pay İşleme Mantığı
+│   ├── CreditCardStrategy.java         // Kredi Kartı İşleme Mantığı
+│   ├── EFTStrategy.java                // EFT/Havale İşleme Mantığı
+│   ├── GooglePayStrategy.java          // Google Pay İşleme Mantığı
+│   ├── IPaymentStrategy.java           // Strateji Arayüzü (Interface)
+└── PaymentApplication.java             // Uygulamayı Başlatan Ana Sınıf
+
+src/main/resources
+├── static
+│   └── index.html                      // Tarayıcıda Açılan Arayüz Dosyası
+├── templates                           // (Opsiyonel) Sunucu Şablonları
+└── application.properties              // PostgreSQL ve Port Ayarları
+```
+
+## Projenin Çalıştırılması
+
+
+Proje kök dizininde docker-compose.yml ve Dockerfile dosyalarının olduğundan emin olun.
+
+
+
+Terminalden şu komutu çalıştırarak her şeyi (Database + App) tek seferde ayağa kaldırabilirsiniz:
+
+```text
+docker-compose up --build
+```
+
+Bu komut veritabanını oluşturur, Maven ile projeyi derler ve uygulamayı yayına alır.
+
+Uygulama ayağa kalktığında paymentsDB otomatik olarak oluşturulur.
+
+Erişim: Uygulama ayağa kalktıktan sonra tarayıcıdan şu adrese gidiniz: http://localhost:8080/index.html

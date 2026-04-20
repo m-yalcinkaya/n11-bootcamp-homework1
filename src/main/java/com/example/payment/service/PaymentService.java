@@ -10,16 +10,17 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
 @Service
-public class CreatePaymentService {
+public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final PaymentDtoConverter paymentDtoConverter;
 
-    public CreatePaymentService(PaymentRepository paymentRepository, PaymentDtoConverter paymentDtoConverter) {
+    public PaymentService(PaymentRepository paymentRepository, PaymentDtoConverter paymentDtoConverter) {
         this.paymentRepository = paymentRepository;
         this.paymentDtoConverter = paymentDtoConverter;
     }
@@ -51,5 +52,9 @@ public class CreatePaymentService {
                 stream().
                 map(paymentDtoConverter::convertPaymentDto).
                 collect(Collectors.toList());
+    }
+
+    public void deletePayment(UUID id) {
+        paymentRepository.deleteById(id);
     }
 }

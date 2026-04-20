@@ -1,10 +1,8 @@
 package com.example.payment.strategy;
 
-
-
-public class QRStrategy implements IPaymentStrategy{
+public class ApplePayStrategy implements IPaymentStrategy{
     @Override
     public String getType() {
-        return "QR";
+        return "ApplePay";
     }
 }

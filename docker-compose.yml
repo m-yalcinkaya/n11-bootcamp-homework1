@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:17.5
+    container_name: payment-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: paymentsDB
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: payment-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/paymentsDB
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=123456
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
+volumes:
+  postgres_data:

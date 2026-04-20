@@ -17,18 +17,37 @@
         th { background-color: #f8f9fa; color: #333; }
         tr:hover { background-color: #f1f1f1; }
         .refresh-btn { background-color: #2980b9; width: auto; display: inline-block; padding: 8px 15px; font-size: 13px; }
+        .delete-btn {
+            background-color: #e74c3c; /* Canlı kırmızı */
+            width: auto;
+            display: inline-block;
+            padding: 8px 15px;
+            font-size: 13px;
+            color: white; /* Yazının okunması için */
+            border: none;
+            border-radius: 4px; /* Opsiyonel: Köşeleri yumuşatmak için */
+            cursor: pointer;
+        }
+
+        /* Üzerine gelince biraz daha koyulaşması için */
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
     </style>
+
 </head>
 <body>
 
 <div class="card">
     <h3>💳 Ödeme Ekranı</h3>
-    <input type="number" id="amount" placeholder="Tutar giriniz (TL)">
+    <input type="number" id="amount" placeholder="Tutar giriniz">
+    <input type="text" id="currency" placeholder="Para Birimi">
     <select id="type">
         <option value="CreditCard">Kredi Kartı</option>
-        <option value="QR">QR ile Ödeme</option>
         <option value="EFT">EFT</option>
         <option value="GooglePay">Google Pay ile ödeme</option>
+        <option value="ApplePay">ApplePay ile ödeme</option>
+
     </select>
     <button onclick="pay()">Ödeme Yap</button>
     <div id="result" style="margin-top: 15px; font-weight: bold; color: #2c3e50; text-align: center;"></div>
@@ -42,10 +61,11 @@
     <table>
         <thead>
         <tr>
-            <th>ID</th>
+            <th>Ödeme Tarihi</th>
             <th>Tutar</th>
             <th>Para Birimi</th>
             <th>Yöntem</th>
+            <th></th>
         </tr>
         </thead>
         <tbody id="payment-list">
@@ -57,10 +77,11 @@
     // Ödeme yapma fonksiyonu
     async function pay() {
         const amount = document.getElementById('amount').value;
+        const currency = document.getElementById('currency').value;
         const type = document.getElementById('type').value;
         const resultDiv = document.getElementById('result');
 
-        const requestData = { amount: parseInt(amount), type: type };
+        const requestData = { amount: parseInt(amount),currency: currency, type: type };
 
         try {
             const response = await fetch('/api/payment/pay', {
@@ -90,10 +111,12 @@
 
             payments.forEach(p => {
                 const row = `<tr>
-                    <td style="color: #888; font-size: 11px;">${p.id}</td>
+                    <td>${formatDate(p.createdAt)}</td>
                     <td style="font-weight: bold;">${p.amount}</td>
                     <td>${p.currency}</td>
                     <td><span style="background: #e1f5fe; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${p.paymentMethod}</span></td>
+
+                    <td><button class="delete-btn" onclick="deletePaymentByID('${p.id}')">İade Et</button></td>
                 </tr>`;
                 listBody.innerHTML += row;
             });
@@ -102,8 +125,44 @@
         }
     }
 
+    async function deletePaymentByID(id) {
+        if (!confirm("Bu işlemi silmek istediğine emin misin?")) return;
+
+        try {
+            const response = await fetch(`/api/payment/delete/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                alert("Ödeme silindi");
+                fetchPayments(); // listeyi yenile
+            } else {
+                alert("Silme işlemi başarısız");
+            }
+
+        } catch (error) {
+            console.error("Silme hatası:", error);
+        }
+    }
+
     // Sayfa açıldığında verileri yükle
     window.onload = fetchPayments;
+
+
+
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+
+        return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+    }
 </script>
 
 </body>
