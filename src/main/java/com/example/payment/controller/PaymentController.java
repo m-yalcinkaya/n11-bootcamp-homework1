@@ -1,11 +1,11 @@
 package com.example.payment.controller;
 
+import com.example.payment.dto.PaymentDto;
 import com.example.payment.dto.PaymentRequest;
 import com.example.payment.service.PaymentService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/payment")
@@ -16,8 +16,13 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
-    @PostMapping("/execute")
-    public String execute(@RequestBody PaymentRequest request) {
-        return paymentService.pay(String.valueOf(request.type()), request.amount());
+    @PostMapping("/pay")
+    public String pay(@RequestBody PaymentRequest request) {
+        return paymentService.pay(request);
+    }
+
+    @GetMapping("All")
+    public List<PaymentDto> getAllPayments(){
+        return paymentService.getAll();
     }
 }

@@ -4,14 +4,25 @@
     <meta charset="UTF-8">
     <title>Ödeme Sistemi</title>
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; }
-        .card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; box-shadow: 2px 2px 10px #eee; }
-        select, input, button { display: block; width: 100%; margin-bottom: 10px; padding: 8px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; display: flex; flex-direction: column; align-items: center; padding-top: 50px; }
+        .card { border: 1px solid #ddd; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); background: white; width: 350px; margin-bottom: 30px; }
+        select, input, button { display: block; width: 100%; margin-bottom: 12px; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
+        button { background-color: #27ae60; color: white; border: none; cursor: pointer; font-weight: bold; transition: background 0.3s; }
+        button:hover { background-color: #219150; }
+
+        /* Liste Tasarımı */
+        .list-container { background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 80%; max-width: 800px; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
+        th { background-color: #f8f9fa; color: #333; }
+        tr:hover { background-color: #f1f1f1; }
+        .refresh-btn { background-color: #2980b9; width: auto; display: inline-block; padding: 8px 15px; font-size: 13px; }
     </style>
 </head>
 <body>
+
 <div class="card">
-    <h3>Ödeme Ekranı</h3>
+    <h3>💳 Ödeme Ekranı</h3>
     <input type="number" id="amount" placeholder="Tutar giriniz (TL)">
     <select id="type">
         <option value="CreditCard">Kredi Kartı</option>
@@ -19,35 +30,81 @@
         <option value="EFT">EFT</option>
         <option value="GooglePay">Google Pay ile ödeme</option>
     </select>
-    <button onclick="pay()">Öde</button>
-    <div id="result" style="margin-top: 15px; font-weight: bold; color: #2c3e50;"></div>
+    <button onclick="pay()">Ödeme Yap</button>
+    <div id="result" style="margin-top: 15px; font-weight: bold; color: #2c3e50; text-align: center;"></div>
+</div>
+
+<div class="list-container">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3>📜 İşlem Geçmişi</h3>
+        <button class="refresh-btn" onclick="fetchPayments()">Listeyi Yenile</button>
+    </div>
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tutar</th>
+            <th>Para Birimi</th>
+            <th>Yöntem</th>
+        </tr>
+        </thead>
+        <tbody id="payment-list">
+        </tbody>
+    </table>
 </div>
 
 <script>
+    // Ödeme yapma fonksiyonu
     async function pay() {
         const amount = document.getElementById('amount').value;
         const type = document.getElementById('type').value;
         const resultDiv = document.getElementById('result');
 
-
-        const requestData = {
-            amount: parseInt(amount),
-            type: type
-        };
+        const requestData = { amount: parseInt(amount), type: type };
 
         try {
-            const response = await fetch('/api/payment/execute', {
+            const response = await fetch('/api/payment/pay', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestData)
             });
-
             const message = await response.text();
             resultDiv.innerText = message;
+
+            // Ödeme başarılıysa listeyi otomatik güncelle
+            fetchPayments();
         } catch (error) {
-            resultDiv.innerText = "Hata oluştu: " + error.message;
+            resultDiv.innerText = "Hata: " + error.message;
         }
     }
+
+    // Verileri API'den çekip listeleme fonksiyonu
+    async function fetchPayments() {
+        const listBody = document.getElementById('payment-list');
+        try {
+            // Sizin yazdığınız GetMapping("All") endpoint'ine istek atar
+            const response = await fetch('/api/payment/All');
+            const payments = await response.json();
+
+            listBody.innerHTML = ""; // Mevcut listeyi temizle
+
+            payments.forEach(p => {
+                const row = `<tr>
+                    <td style="color: #888; font-size: 11px;">${p.id}</td>
+                    <td style="font-weight: bold;">${p.amount}</td>
+                    <td>${p.currency}</td>
+                    <td><span style="background: #e1f5fe; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${p.paymentMethod}</span></td>
+                </tr>`;
+                listBody.innerHTML += row;
+            });
+        } catch (error) {
+            console.error("Liste yüklenirken hata:", error);
+        }
+    }
+
+    // Sayfa açıldığında verileri yükle
+    window.onload = fetchPayments;
 </script>
+
 </body>
 </html>

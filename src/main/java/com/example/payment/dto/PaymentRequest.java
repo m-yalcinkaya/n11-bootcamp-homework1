@@ -1,8 +1,10 @@
 package com.example.payment.dto;
 
 
+import java.math.BigDecimal;
+
 public record PaymentRequest(
-        int amount,
+        BigDecimal amount,
         String type
 ) {
 }
