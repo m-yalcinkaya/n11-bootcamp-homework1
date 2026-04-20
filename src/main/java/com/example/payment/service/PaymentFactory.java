@@ -15,7 +15,7 @@ public class PaymentFactory {
             return (IPaymentStrategy) clazz.getDeclaredConstructor().newInstance();
 
         } catch (Exception e) {
-            throw new IllegalArgumentException("Geçersiz ödeme yöntemi: " + type);
+            throw new IllegalArgumentException("Invalid payment method: " + type);
         }
     }
 }

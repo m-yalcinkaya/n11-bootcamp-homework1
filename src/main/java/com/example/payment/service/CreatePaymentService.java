@@ -1,7 +1,7 @@
 package com.example.payment.service;
 
+import com.example.payment.dto.CreatePaymentRequest;
 import com.example.payment.dto.PaymentDto;
-import com.example.payment.dto.PaymentRequest;
 import com.example.payment.dto.converter.PaymentDtoConverter;
 import com.example.payment.model.Payment;
 import com.example.payment.repository.PaymentRepository;
@@ -14,22 +14,22 @@ import java.util.stream.Collectors;
 
 
 @Service
-public class PaymentService {
+public class CreatePaymentService {
 
     private final PaymentRepository paymentRepository;
     private final PaymentDtoConverter paymentDtoConverter;
 
-    public PaymentService(PaymentRepository paymentRepository, PaymentDtoConverter paymentDtoConverter) {
+    public CreatePaymentService(PaymentRepository paymentRepository, PaymentDtoConverter paymentDtoConverter) {
         this.paymentRepository = paymentRepository;
         this.paymentDtoConverter = paymentDtoConverter;
     }
 
-    public String pay(PaymentRequest request) {
+    public String pay(CreatePaymentRequest request) {
         try {
             Payment payment = Payment.builder()
                     .amount(request.amount())
                     .paymentMethod(request.type())
-                    .currency("TL")
+                    .currency(request.currency())
                     .createdAt(LocalDateTime.now())
                     .build();
 
@@ -42,7 +42,7 @@ public class PaymentService {
 
 
         } catch (Exception e) {
-            return "Sistem hatası: Ödeme gerçekleştirilemedi.";
+            return "System Error: Payment unsuccessful";
         }
     }
 

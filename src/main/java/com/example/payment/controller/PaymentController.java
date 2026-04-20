@@ -1,8 +1,11 @@
 package com.example.payment.controller;
 
+import com.example.payment.dto.CreatePaymentRequest;
 import com.example.payment.dto.PaymentDto;
-import com.example.payment.dto.PaymentRequest;
-import com.example.payment.service.PaymentService;
+import com.example.payment.service.CreatePaymentService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,19 +13,19 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/payment")
 public class PaymentController {
-    private final PaymentService paymentService;
+    private final CreatePaymentService createPaymentService;
 
-    public PaymentController(PaymentService paymentService) {
-        this.paymentService = paymentService;
+    public PaymentController(CreatePaymentService createPaymentService) {
+        this.createPaymentService = createPaymentService;
     }
 
     @PostMapping("/pay")
-    public String pay(@RequestBody PaymentRequest request) {
-        return paymentService.pay(request);
+    public ResponseEntity<String> pay(@Valid @RequestBody CreatePaymentRequest request) {
+        return new ResponseEntity<>(createPaymentService.pay(request), HttpStatus.OK);
     }
 
     @GetMapping("All")
-    public List<PaymentDto> getAllPayments(){
-        return paymentService.getAll();
+    public ResponseEntity<List<PaymentDto>> getAllPayments(){
+        return new ResponseEntity<>(createPaymentService.getAll(), HttpStatus.OK);
     }
 }
