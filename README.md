@@ -19,6 +19,27 @@ Sistemin çalışma anına dair arayüz işlem çıktıları aşağıdadır:
 * **Tasarım Deseni:** Strategy Design Pattern, Factory Design Pattern
 * **Frontend:** Vanilla JavaScript & HTML (Client-Side Rendering)
 
+## Reflection ve Factory Metod İle Payment Nesnesi Oluşturma
+```text
+@Service
+public class PaymentFactory {
+
+    public static IPaymentStrategy createPaymentMethod(String type) {
+        try {
+            String className = "com.example.payment.strategy." + type + "Strategy";
+
+            Class<?> clazz = Class.forName(className);
+            return (IPaymentStrategy) clazz.getDeclaredConstructor().newInstance();
+
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid payment method: " + type);
+        }
+    }
+}
+```
+
+
+
 ## Uygulanan SOLID Prensipleri
 
 Proje geliştirilirken aşağıdaki yazılım prensipleri temel alınmıştır:
