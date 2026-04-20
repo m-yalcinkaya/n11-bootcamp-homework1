@@ -1,30 +1,24 @@
 package com.example.payment.service;
 
-import com.example.payment.constants.PaymentType;
 import com.example.payment.strategy.IPaymentStrategy;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.lang.reflect.InvocationTargetException;
+
 
 @Service
 public class PaymentService {
 
-    private final Map<PaymentType, IPaymentStrategy> strategyMap;
-
-    public PaymentService(List<IPaymentStrategy> strategies) {
-        strategyMap = strategies.stream()
-                .collect(Collectors.toMap(IPaymentStrategy::getType, s -> s));
-    }
-
     public String pay(String type, int amount) {
         try {
-            PaymentType paymentType = PaymentType.valueOf(type.toUpperCase());
-            IPaymentStrategy strategy = strategyMap.get(paymentType);
-            return (strategy != null) ? strategy.process(amount) : "Yöntem bulunamadı!";
+             Class<?> clazz = Class.forName("com.example.payment.strategy." + type + "Strategy");
+            IPaymentStrategy strategy = (IPaymentStrategy) clazz.getDeclaredConstructor().newInstance();
+            return strategy.process(amount);
         } catch (IllegalArgumentException e) {
             return "Geçersiz ödeme yöntemi: " + type;
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException |
+                 InvocationTargetException e) {
+            throw new RuntimeException(e);
         }
     }
 

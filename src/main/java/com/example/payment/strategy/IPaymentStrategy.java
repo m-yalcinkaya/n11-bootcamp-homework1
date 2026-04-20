@@ -1,9 +1,6 @@
 package com.example.payment.strategy;
 
-import com.example.payment.constants.PaymentType;
-
-public interface IPaymentStrategy {
-
-    PaymentType getType();
-    String process(int amount);
+public interface IPaymentStrategy{
+    String getType();
+    public String process(int amount);
 }

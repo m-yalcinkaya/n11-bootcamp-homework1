@@ -1,15 +1,13 @@
 package com.example.payment.strategy;
 
-
-
-public class QRStrategy implements IPaymentStrategy{
+public class GooglePayStrategy implements  IPaymentStrategy{
     @Override
     public String getType() {
-        return "QR";
+        return "GooglePay";
     }
 
     @Override
     public String process(int amount) {
-        return amount + " TL QR ile ödendi.";
+        return amount + " TL " + getType() + " ile ödendi.";
     }
 }
